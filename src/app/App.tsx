@@ -56,94 +56,81 @@ export default function App() {
     setLoading(false);
   };
 
-  return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-emerald-500/30 overflow-x-hidden">
-      <Navbar futureMode={futureMode} setFutureMode={setFutureMode} />
+return (
+  <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-emerald-500/30 overflow-x-hidden">
+    <Navbar futureMode={futureMode} setFutureMode={setFutureMode} />
+    
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row gap-6 items-end justify-between">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight text-white mb-2">Command Center</h2>
-            <p className="text-slate-400">Configure global policies to simulate environmental impact.</p>
-          </div>
-          
-          <div className="flex items-center gap-3 bg-slate-900/50 p-1.5 rounded-xl border border-slate-800">
-            <button
-              onClick={runSimulation}
-              disabled={loading || !selectedCity}
-              className={`relative overflow-hidden group flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold transition-all duration-300 ${
-                !selectedCity 
-                  ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                  : loading 
-                    ? 'bg-emerald-500/20 text-emerald-300 cursor-wait'
-                    : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]'
-              }`}
-            >
-              {loading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <Play className="w-5 h-5 fill-current" />
-              )}
-              <span>{loading ? 'Simulating...' : 'Run Simulation'}</span>
-            </button>
-          </div>
+      {/* Header */}
+      <div className="flex flex-col md:flex-row gap-6 items-end justify-between">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight text-white mb-2">Command Center</h2>
+          <p className="text-slate-400">Configure global policies to simulate environmental impact.</p>
         </div>
-        
-        {/* Top Split: Map & Controls */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-6">
-            
-            <CitySelector onCitySelected={handleCitySearch} />
-            
-            <MapSection 
-              cities={activeCities} 
-              selectedCity={selectedCity} 
-              onSelectCity={setSelectedCity}
-              policies={policies}
+      </div>
+
+      {/* Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        {/* LEFT COLUMN */}
+        <div className="lg:col-span-2 space-y-6">
+          <CitySelector onCitySelected={handleCitySearch} />
+
+          <MapSection 
+            cities={activeCities} 
+            selectedCity={selectedCity} 
+            onSelectCity={setSelectedCity}
+            policies={policies}
+            futureMode={futureMode}
+          />
+
+          <AnimatePresence>
+            {(results || loading) && (
+              <motion.div
+                key="results-dashboard"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden"
+              >
+                <ResultsDashboard 
+                  results={results} 
+                  loading={loading} 
+                  futureMode={futureMode} 
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* RIGHT COLUMN */}
+        <div className="space-y-6">
+          <PolicyControls policies={policies} setPolicies={setPolicies} />
+        </div>
+
+      </div> {/* ✅ grid CLOSED */}
+
+      {/* FULL WIDTH CHARTS (MOVED OUTSIDE GRID) */}
+      <AnimatePresence mode="wait">
+        {(results || loading) && (
+          <motion.div
+            key="charts-section"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+          >
+            <ChartsSection
+              results={results}
+              city={selectedCity}
               futureMode={futureMode}
+              loading={loading}
             />
-            
-            <AnimatePresence>
-              {(results || loading) && (
-                <motion.div
-                  key="results-dashboard"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="overflow-hidden"
-                >
-                  <ResultsDashboard results={results} loading={loading} futureMode={futureMode} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-            
-          </div>
-          
-          <div className="space-y-6">
-            <PolicyControls policies={policies} setPolicies={setPolicies} />
-            
-          
-        
-        {/* Charts Full Width */}
-        <AnimatePresence mode="wait">
-          {(results || loading) && (
-             <motion.div
-               key="charts-section"
-               initial={{ opacity: 0, y: 20 }}
-               animate={{ opacity: 1, y: 0 }}
-               exit={{ opacity: 0, y: 20 }}
-             >
-                <ChartsSection results={results} city={selectedCity} futureMode={futureMode} loading={loading} />
-             </motion.div>
-          )}
-        </AnimatePresence>
-          </div>
-          
-          </div>
-          
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      </main>
-    </div>
-  );
+    </main>
 
+  </div> /* ✅ ROOT CLOSED */
+);
