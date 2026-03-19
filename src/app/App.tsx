@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { Analytics } from "@vercel/analytics/react";
 import { Navbar } from "./components/Navbar";
 import { MapSection } from "./components/MapSection";
 import { PolicyControls } from "./components/PolicyControls";
@@ -155,6 +156,7 @@ export default function App() {
           )}
         </AnimatePresence>
       </main>
+      <Analytics />
     </div> /* ✅ ROOT CLOSED */
   );
 }
